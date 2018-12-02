@@ -3,40 +3,18 @@
 # http://naelshiab.com/tutorial-send-email-python/
 # https://docs.python.org/3.4/library/email-examples.html
 
-import os
-import smtplib
 import getpass
-from email import encoders
-from email.mime.multipart import MIMEMultipart
-from email.mime.base import MIMEBase
-from email.mime.text import MIMEText
+import myemailib
  
 fromaddr = 'hhhhsoso@hkcc-polyu.edu.hk'
 toaddr = "haggenso@gmail.com"
 passwd = getpass.getpass('Password: ')
-
-server = smtplib.SMTP('smtp.office365.com', 587)
-server.ehlo()
-server.starttls()
-server.login(fromaddr, passwd)
-
-msg = MIMEMultipart()
-msg['From'] = fromaddr
-msg['To'] = toaddr
-msg['Subject'] = "SUBJECT OF THE MAIL"
-body = "YOUR MESSAGE HERE"
-msg.attach(MIMEText(body, 'plain'))
-
 directory = "."
 filename = "test.txt"
-path = os.path.join(directory, filename)
-with open(path, 'rb') as fp:
-  attach = MIMEBase("application","octet-stream")
-  attach.set_payload(fp.read())
-# Encode the payload using Base64
-encoders.encode_base64(attach)
-attach.add_header('Content-Disposition', 'attachment', filename=filename)
-msg.attach(attach)
+
+server = myemailib.email_login(fromaddr, passwd)
+msg = myemailib.create_msg(fromaddr, toaddr, "SUBJECT OF THE MAIL", "YOUR MESSAGE HERE")
+myemailib.attach_msg(directory, filename, msg)
 
 text = msg.as_string()
 server.sendmail(fromaddr, toaddr, text)
